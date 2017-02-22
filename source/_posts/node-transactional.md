@@ -9,8 +9,7 @@ tags:
 ---
 Nodes是单线程运行的，所有io操作是在另一个线程执行，处理完后通过回调函数通知nodejs线程，所以在dao层会出现回调，尤其是当一些业务逻辑或数据库操作需要顺序执行的时候，会产生层层回调，如何更好地复用代码，管理*transaction*，是一个问题。
 
-##### router
-
+#### router
 ```javascript
 router.get('/add', async function(req, res, next) {
   try {
@@ -24,8 +23,7 @@ router.get('/add', async function(req, res, next) {
 
 router的回调是一个async方法，try catch 后，有error就调用`next(error);`让下个处理异常的*middleware*处理，没什么特别的
 
-##### dao
-
+#### dao
 ```javascript
 const sqls = {
     insert:'INSERT INTO user(id, name, age) VALUES(0,?,?)'
@@ -44,8 +42,7 @@ module.exports = dao;
 
 dao所有方法都返回一个promise，connection需要调用方传进来（*暂时没想到解决办法*），因为同一个transaction需要用同一个connection。
 
-##### service
-
+#### service
 ```javascript
 const userDao = require('../dao/userDao')
 const dbHelper = require('../dao/dbHelper')
@@ -69,8 +66,7 @@ module.exports = service;
 
 这句主要是给addUser方法加一层代理(实际router里调用的是proxy方法)。
 
-##### dbHelper
-
+#### dbHelper
 ```javascript
 var mysql = require('mysql');
 var $conf = require('../conf/db');
@@ -135,21 +131,21 @@ dbHelper是关键***transactionProxy***方法可以给fn外面包了一层，这
 5. try catch住，有异常就rollback
 6. 最后finally中release connection
 
-##### 好处
+#### 好处
 
 - 使用promise async await的写法，没有嵌套的回调，代码可读性强，易于维护
 - transaction加在service层，这样dao层的方法可以复用(不用担心transaction)
 - 写法简单，重复的 `beginTransaction` `commit` `rollback` 以及dao层的异常处理都可以统一放到`transactionProxy`中去处理。
 
-##### 不足
+#### 不足
 
 - connection需要显示地传递，有依赖，解决思路是如何不需要传递connection,就能使得dao的方法使用同一个connection。
 
 ------
 
-#### decorator version
+### decorator version
 
-##### service
+#### service
 
 ```javascript
 const userDao = require('../../dao/userDao/userDao')
@@ -166,7 +162,7 @@ class LoginService {
 module.exports = LoginService
 ```
 
-##### dbHelper
+#### dbHelper
 
 ```javascript
 helper.transactional = function (target, name, descriptor) {
@@ -205,11 +201,11 @@ helper.transactional = function (target, name, descriptor) {
 
 ------
 
-#### continuation-local-storage version
+### continuation-local-storage version
 
 [**continuation-local-storage**](https://github.com/othiym23/node-continuation-local-storage)的作用相当于java里的ThreadLocal,不同的是它是基于链式回调，而不是真正的thread(nodejs是单线程的)。使用**continuation-local-storage**,我们可以在整个链式回调方法的生命周期里，get、set该回调链独有的变量值，于是就可以做到不显示的传递connection，而在整个transaction里使用同一个connection了。
 
-##### service
+#### service
 
 ```javascript
 const UserDao = require('../../dao/userDao/userDao')
@@ -237,7 +233,7 @@ module.exports = LoginService
 
 service里只是把之前所有传递的connection去掉了。
 
-##### dao
+#### dao
 
 ```javascript
 const connection = require('../../dao/dbHelper').connection
@@ -277,7 +273,7 @@ module.exports = UserDao;
 
 dao改写成了class，因为需要加*@connection* decorator，@connection改写了connection属性的**get**方法,拿到当前回调链中定义的connection。
 
-##### dbHelper
+#### dbHelper
 
 ```javascript
 var mysql = require('mysql');
@@ -359,7 +355,8 @@ connectionLocal.set(connectionName, connection);
 ```
 
 开启一个新的context，把当前transaction连接保存到当前的**connectionLocal**中，之后的回调链中都能拿到同一个connection。
-
 *@connection* decorator改写了**get**方法,返回当前**connectionLocal**中保存的connection。
-
 这样**service**、**dao**的写法就十分简单，通过*@transactional*、*@connection*，两个decorator就可以控制事务。
+
+#### 问题
+重新测试发现*node-continuation-local-storage*不支持async function,我提了个[issue](https://github.com/othiym23/node-continuation-local-storage/issues/98),原来V8引擎的async实现方式有些特殊，V8 5.7，也就是Node 8会得到支持,本来Generator函数可以完美使用local storage,但是不支持decorator,所以暂时就这样吧。
