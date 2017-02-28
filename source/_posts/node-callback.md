@@ -3,6 +3,7 @@ title: Nodejs解决回调地狱
 date: 2017-02-14 10:21:02
 tags: 
 - nodejs 
+- js
 - async
 - Generator
 ---
