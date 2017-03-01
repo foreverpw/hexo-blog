@@ -59,3 +59,40 @@ div{
 * 可继承的样式： font-size font-family color, UL LI DL DD DT;
 * 不可继承的样式：border padding margin width height ;
 
+##### 6、简单的文字模糊效果
+```css
+p {
+    color: transparent;
+    text-shadow: #111 0 0 5px;
+}
+```
+
+##### 7、calc运算
+```css
+.container{
+    background-position: calc(100% - 50px) calc(100% - 20px);
+}
+```
+
+##### 8、利用重复指定box-shadow来达到多个边框的效果
+```css
+div {
+    box-shadow: 0 0 0 6px rgba(0, 0, 0, 0.2), 0 0 0 12px rgba(0, 0, 0, 0.2), 0 0 0 18px rgba(0, 0, 0, 0.2), 0 0 0 24px rgba(0, 0, 0, 0.2);
+    height: 200px;
+    margin: 50px auto;
+    width: 400px
+}
+```
+
+##### 9、实时编辑CSS
+通过设置style标签的display:block样式可以让页面的style标签显示出来，并且加上contentEditable属性后可以让样式成为可编辑状态，更改后的样式效果也是实时更新呈现的。此技巧在IE下无效。
+```html
+<!DOCTYPE html>
+<html>
+    <body>
+        <style style="display:block" contentEditable>
+            body { color: blue }
+        </style>
+    </body>
+</html>
+```
