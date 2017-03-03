@@ -7,6 +7,8 @@ tags:
 - transaction
 - mysql
 - continuation-local-storage
+categories:
+- 前端
 ---
 Nodes是单线程运行的，所有io操作是在另一个线程执行，处理完后通过回调函数通知nodejs线程，所以在dao层会出现回调，尤其是当一些业务逻辑或数据库操作需要顺序执行的时候，会产生层层回调，如何更好地复用代码，管理*transaction*，是一个问题。
 

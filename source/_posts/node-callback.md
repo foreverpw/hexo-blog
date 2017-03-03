@@ -6,6 +6,8 @@ tags:
 - js
 - async
 - Generator
+categories:
+- 前端
 ---
 Nodejs是单线程运行的，很多时候需要写回调方法，但当一些业务逻辑或io操作需要顺序执行的时候，会产生层层回调。
 

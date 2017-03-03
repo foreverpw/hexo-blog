@@ -1,7 +1,10 @@
+---
 layout: draf
 title: javascript中的数字
 tags:
   - js
+categories:
+- 前端
 date: 2017-03-03 15:23:07
 ---
 
