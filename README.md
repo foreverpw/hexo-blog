@@ -5,6 +5,8 @@
 
 ``` bash
 $ hexo new "My New Post"
+$ hexo new draft "My New Post"
+$ hexo publish draft "My New Post"
 ```
 
 More info: [Writing](https://hexo.io/docs/writing.html)
