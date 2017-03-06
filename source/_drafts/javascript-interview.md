@@ -59,8 +59,11 @@ new Foo().getName();//3
 new new Foo().getName();//3
 ```
 
-##### 3、AMD和CMD的区别
+##### 3、AMD、CMD、Commonjs的区别
 参考玉伯的[回答](https://www.zhihu.com/question/20351507/answer/14859415)
+
+AMD和CMD都是提前读取（下载）了文件，但AMD是提前加载（执行）文件中的代码，CMD是按需加载（执行）文件中的代码。
+Commonjs 是同步（阻塞式）加载模块。
 
 ##### 4、如果 list 很大，下面的这段递归代码会造成堆栈溢出。如果在不改变递归模式的前提下修善这段代码？
 ```javascript
